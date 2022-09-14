@@ -1,0 +1,149 @@
+**Query #1**
+
+    select 
+    customer_id,sum(sales.product_id * price) 
+    from dannys_diner.sales 
+    join dannys_diner.menu on 
+    menu.product_id = sales.product_id
+    
+    group by customer_id
+    
+    order by customer_id asc
+    ;
+
+| customer_id | sum |
+| ----------- | --- |
+| A           | 178 |
+| B           | 152 |
+| C           | 108 |
+
+---
+**Query #2**
+
+    select customer_id,count(distinct(order_date)) as "number of days"
+    from dannys_diner.sales
+    group by customer_id
+    order by "number of days" desc
+    
+    ;
+
+| customer_id | number of days |
+| ----------- | -------------- |
+| B           | 6              |
+| A           | 4              |
+| C           | 2              |
+
+---
+**Query #3**
+
+    select distinct on (customer_id) customer_id ,product_name , order_date
+    from dannys_diner.sales 
+    join dannys_diner.menu on menu.product_id = sales.product_id
+    order by (customer_id) ,order_date,sales.product_id desc
+    ;
+
+| customer_id | product_name | order_date               |
+| ----------- | ------------ | ------------------------ |
+| A           | curry        | 2021-01-01T00:00:00.000Z |
+| B           | curry        | 2021-01-01T00:00:00.000Z |
+| C           | ramen        | 2021-01-01T00:00:00.000Z |
+
+---
+**Query #4**
+
+    select sales.product_id,count(sales.product_id)as maxi,product_name
+    from dannys_diner.sales join dannys_diner.menu on sales.product_id = menu.product_id
+    group by sales.product_id,menu.product_name
+    order by maxi desc
+    limit 1
+    
+    
+    ;
+
+| product_id | maxi | product_name |
+| ---------- | ---- | ------------ |
+| 3          | 8    | ramen        |
+
+---
+**Query #5**
+
+    select distinct on  (customer_id)customer_id, product_name, count(sales.product_id)as maxi
+    from dannys_diner.sales 
+    join dannys_diner.menu on menu.product_id = sales.product_id
+    group by (customer_id),sales.product_id,product_name
+    order by (customer_id) ,maxi desc,sales.product_id  desc
+    ;
+
+| customer_id | product_name | maxi |
+| ----------- | ------------ | ---- |
+| A           | ramen        | 3    |
+| B           | ramen        | 2    |
+| C           | ramen        | 3    |
+
+---
+**Query #6**
+
+    select distinct on  (members.customer_id)members.customer_id, product_name
+    
+    from dannys_diner.sales 
+    join dannys_diner.members on  sales.customer_id = members.customer_id 
+    join dannys_diner.menu on sales.product_id = menu.product_id 
+    where members.join_date > sales.order_date
+    order by  members.customer_id;
+
+| customer_id | product_name |
+| ----------- | ------------ |
+| A           | sushi        |
+| B           | sushi        |
+
+---
+**Query #7**
+
+    select distinct on  (members.customer_id)members.customer_id, product_name
+    from dannys_diner.sales 
+    join dannys_diner.members on  sales.customer_id = members.customer_id 
+    join dannys_diner.menu on sales.product_id = menu.product_id 
+    where members.join_date < sales.order_date
+    order by  members.customer_id, members.join_date desc;
+
+| customer_id | product_name |
+| ----------- | ------------ |
+| A           | ramen        |
+| B           | sushi        |
+
+---
+**Query #8**
+
+    select   members.customer_id,sum(sales.product_id * price) 
+    from dannys_diner.sales 
+    right join dannys_diner.members on  sales.customer_id = members.customer_id 
+    join dannys_diner.menu on sales.product_id = menu.product_id 
+    where members.join_date < sales.order_date
+    group by  members.customer_id
+    order by  members.customer_id;
+
+| customer_id | sum |
+| ----------- | --- |
+| A           | 108 |
+| B           | 82  |
+
+---
+**Query #9**
+
+    SELECT
+      	product_id,
+        product_name,
+        price
+    FROM dannys_diner.menu
+    ORDER BY price DESC
+    LIMIT 5;
+
+| product_id | product_name | price |
+| ---------- | ------------ | ----- |
+| 2          | curry        | 15    |
+| 3          | ramen        | 12    |
+| 1          | sushi        | 10    |
+
+---
+
+[View on DB Fiddle](https://www.db-fiddle.com/f/2rM8RAnq7h5LLDTzZiRWcd/138)
