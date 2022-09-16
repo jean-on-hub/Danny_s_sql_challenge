@@ -130,20 +130,43 @@
 ---
 **Query #9**
 
-    SELECT
-      	product_id,
-        product_name,
-        price
-    FROM dannys_diner.menu
-    ORDER BY price DESC
-    LIMIT 5;
+    with pp as(
+     select *, case
+      when menu.product_name = 'sushi' then price *10 *2
+      else price *10
+      end as points
+      from dannys_diner.sales join dannys_diner.menu using(product_id)
+      
+    )
+    select customer_id,sum(pp.points) from pp 
+    group by customer_id
+    order by sum ;
 
-| product_id | product_name | price |
-| ---------- | ------------ | ----- |
-| 2          | curry        | 15    |
-| 3          | ramen        | 12    |
-| 1          | sushi        | 10    |
+| customer_id | sum |
+| ----------- | --- |
+| C           | 360 |
+| A           | 860 |
+| B           | 940 |
 
 ---
+**Query #10**
 
-[View on DB Fiddle](https://www.db-fiddle.com/f/2rM8RAnq7h5LLDTzZiRWcd/138)
+    with pp as(
+     select *, case
+      when sales.order_date >= members.join_date then price *10 *2
+      else price *10
+      end as points
+      from dannys_diner.sales  join dannys_diner.members  using(customer_id) join dannys_diner.menu using(product_id)
+      
+    )
+    select customer_id, sum(points)
+    from pp
+    group by customer_id
+    order by customer_id
+    ;
+
+| customer_id | sum  |
+| ----------- | ---- |
+| A           | 1270 |
+| B           | 1080 |
+---
