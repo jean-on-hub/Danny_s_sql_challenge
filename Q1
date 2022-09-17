@@ -149,24 +149,28 @@
 | B           | 940 |
 
 ---
+
+
 **Query #10**
 
     with pp as(
-     select *, case
-      when sales.order_date >= members.join_date then price *10 *2
-      else price *10
-      end as points
-      from dannys_diner.sales  join dannys_diner.members  using(customer_id) join dannys_diner.menu using(product_id)
-      
-    )
-    select customer_id, sum(points)
-    from pp
-    group by customer_id
-    order by customer_id
-    ;
+         select *, case
+          when sales.order_date >= members.join_date and members.join_date < members.join_date + interval'7 days' then price *10 *2
+          when menu.product_name = 'sushi' then price *10 *2
+          else price *10
+          end as points
+          from dannys_diner.sales  join dannys_diner.members  using(customer_id) join dannys_diner.menu using(product_id)
+          
+        )
+        select customer_id, sum(points)
+        from pp
+        group by customer_id
+        order by customer_id
+        ;
 
 | customer_id | sum  |
 | ----------- | ---- |
-| A           | 1270 |
-| B           | 1080 |
+| A           | 1370 |
+| B           | 1180 |
+
 ---
